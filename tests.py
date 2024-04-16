@@ -31,7 +31,7 @@ class TestBooksCollector:
         collector = BooksCollector()
         collector.add_new_book(name)
         collector.set_book_genre(name, genre)
-        book_with_genre = collector.get_books_with_specific_genre('Сказка')
+        books_with_genre = collector.get_books_with_specific_genre('Сказка')
         assert 'Снежная королева', 'Колобок' in books_with_genre
 
     @pytest.mark.parametrize('name, genre', [
@@ -83,4 +83,3 @@ class TestBooksCollector:
         collector.add_book_in_favorites(name)
         favorite_books = collector.get_list_of_favorites_books()
         assert name in favorite_books
-    # чтобы тесты были независимыми в каждом из них создавай отдельный экземпляр класса BooksCollector()
