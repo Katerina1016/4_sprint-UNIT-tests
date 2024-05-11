@@ -1,24 +1,61 @@
-from main import BooksCollector
+import pytest
 
-# класс TestBooksCollector объединяет набор тестов, которыми мы покрываем наше приложение BooksCollector
-# обязательно указывать префикс Test
+
 class TestBooksCollector:
+    def test_add_new_book_book_no_genre(self, books_collection):
+        book_add = 'Золушка'
+        books_collection.add_new_book(book_add)
+        assert books_collection.get_book_genre(book_add) == ''
 
-    # пример теста:
-    # обязательно указывать префикс test_
-    # дальше идет название метода, который тестируем add_new_book_
-    # затем, что тестируем add_two_books - добавление двух книг
-    def test_add_new_book_add_two_books(self):
-        # создаем экземпляр (объект) класса BooksCollector
-        collector = BooksCollector()
+    @pytest.mark.parametrize('book', ['Всё или ничего, либо как нам быть в такой ситуации'])
+    def test_add_new_book_book_with_name_large_number_of_characters(self, book, books_collection):
+        books_collection.add_new_book(book)
+        assert len(books_collection.get_books_genre()) == 0
 
-        # добавляем две книги
-        collector.add_new_book('Гордость и предубеждение и зомби')
-        collector.add_new_book('Что делать, если ваш кот хочет вас убить')
+    def test_set_book_genre_genre_added(self, books_collection):
+        book = 'Оно'
+        genre = 'Фантастика'
+        books_collection.add_new_book(book)
+        books_collection.set_book_genre(book, genre)
+        assert books_collection.get_book_genre(book) == genre
 
-        # проверяем, что добавилось именно две
-        # словарь books_rating, который нам возвращает метод get_books_rating, имеет длину 2
-        assert len(collector.get_books_rating()) == 2
+    def test_set_book_genre_genre_not_added(self, books_collection):
+        book = 'История России'
+        excluded_genre = 'Учебная'
+        books_collection.add_new_book(book)
+        books_collection.set_book_genre(book, excluded_genre)
+        assert books_collection.get_book_genre(book) == ''
 
-    # напиши свои тесты ниже
-    # чтобы тесты были независимыми в каждом из них создавай отдельный экземпляр класса BooksCollector()
+    def test_get_books_with_specific_genre_no_such_genre(self, books_collection_five_books):
+        assert len (books_collection_five_books.get_books_with_specific_genre('Поэзия')) == 0
+
+    def test_get_books_for_children_no_age_restricted_books(self, books_collection_five_books):
+        books_for_children = books_collection_five_books.get_books_for_children()
+        assert len(books_for_children) == 1 and books_for_children == ['Оно']
+
+    def test_add_book_in_favorite_name_book_in_favorite(self, books_collection):
+        book = 'Оно'
+        books_collection.add_new_book(book)
+        books_collection.add_book_in_favorites(book)
+        favorite_books = books_collection.get_list_of_favorites_books()
+        assert len(favorite_books) == 1 and favorite_books[0] == book
+
+    def test_delete_book_from_favorite_name_book_delete(self, books_collection):
+        book = 'Оно'
+        books_collection.add_new_book(book)
+        books_collection.add_book_in_favorites(book)
+        books_collection.delete_book_from_favorites(book)
+        assert len(books_collection.get_list_of_favorites_books()) == 0
+
+    def test_get_list_of_favorite_books_not_list_not_added(self, books_collection):
+        book = 'Еще'
+        books_collection.add_book_in_favorites(book)
+        assert len(books_collection.get_list_of_favorites_books()) == 0
+
+    def test_add_book_in_favorite_book_add_twice_not_added(self, books_collection):
+        book = 'Учение свет'
+        books_collection.add_new_book(book)
+        books_collection.add_book_in_favorites(book)
+        books_collection.add_book_in_favorites(book)
+        favorite_books=books_collection.get_list_of_favorites_books()
+        assert len(favorite_books) == 1 and favorite_books[0] == book
